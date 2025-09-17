@@ -11,6 +11,9 @@ public class PlayerMovement : MonoBehaviour
     // necessary for animations and physics
     private Rigidbody2D rb2d;
     private Animator myAnimator;
+
+    private bool facingRight = true;
+
     // variables to play with
     public float speed = 2.0f;
     public float jumpForce = 8.0f;
@@ -82,6 +85,23 @@ public class PlayerMovement : MonoBehaviour
         if (rb2d.linearVelocity.y < 0)
         {
             rb2d.linearVelocity += Vector2.down * Physics2D.gravity.y * 2f * Time.fixedDeltaTime;
+        }
+        // flip the character to face the correct direction
+        Flip(horizontalMovement);
+    }
+
+    // flipping function
+    private void Flip(float horizontal)
+    {
+        if (horizontal != 0)
+        {
+            if ((horizontal > 0 && !facingRight) || (horizontal < 0 && facingRight))
+            {
+                facingRight = !facingRight;
+                Vector3 theScale = transform.localScale;
+                theScale.x *= -1;
+                transform.localScale = theScale;
+            }
         }
     }
 
