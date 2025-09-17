@@ -86,8 +86,11 @@ public class PlayerMovement : MonoBehaviour
         {
             rb2d.linearVelocity += Vector2.down * Physics2D.gravity.y * 2f * Time.fixedDeltaTime;
         }
+
         // flip the character to face the correct direction
         Flip(horizontalMovement);
+
+        myAnimator.SetFloat("speed", Math.Abs(horizontalMovement));
     }
 
     // flipping function
