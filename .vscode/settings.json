@@ -69,6 +69,7 @@
     "dotnet.defaultSolution": "FirstProject.sln",
     "cSpell.words": [
         "Behaviour",
-        "Rigidbody"
+        "Rigidbody",
+        "Spacebar"
     ]
 }
