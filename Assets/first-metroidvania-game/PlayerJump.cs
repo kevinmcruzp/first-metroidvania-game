@@ -11,29 +11,32 @@ public class PlayerJump : MonoBehaviour
     // force, apply, force, 1x
     // rb.velocity = new Vector2(rb.velocity.x, jumpForce);
 
-    [Header("Public Vars")]
-    public float jumpForce = 3.5f;
-    public float jumpHoldForce = 0.3f;
+    [Header("Jump Details")]
+    public float jumpForce;
+    public float jumpHoldForce;
     public bool grounded;
-    private Rigidbody2D rb2d;
-    public float jumpTime = 0.25f;
+    public float jumpTime;
     private float jumpTimeCounter;
     private bool stoppingJump;
     private bool isJumpPressed;
-
     private PlayerInput playerInput;
     private InputAction jumpAction;
 
-    [Header("Private Vars")]
+    [Header("Ground Details")]
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float radius = 0.05f;
     [SerializeField] private LayerMask groundLayer;
+
+    [Header("Components")]
+    private Rigidbody2D rb2d;
+    private Animator myAnimator;
 
     void Start()
     {
         rb2d = GetComponent<Rigidbody2D>();
         playerInput = GetComponent<PlayerInput>();
         jumpAction = playerInput.actions["Jump"];
+        myAnimator = GetComponent<Animator>();
 
         // Subscribe to the jump action events
         jumpAction.performed += OnJumpPerformed;
@@ -54,9 +57,21 @@ public class PlayerJump : MonoBehaviour
         Debug.Log("Jump action canceled!");
     }
 
+    // myAnimator.SetBool("falling", true);
+    // myAnimator.SetBool("falling", false);
+
+    // myAnimator.SetTrigger("jump");
+    // myAnimator.ResetTrigger("jump");
+
     void Update()
     {
         grounded = Physics2D.OverlapCircle(groundCheck.position, radius, groundLayer);
+
+        if (grounded)
+        {
+            myAnimator.ResetTrigger("jump");
+            myAnimator.SetBool("falling", false);
+        }
 
         // Start jump if grounded and jump is pressed
         if (isJumpPressed && grounded && jumpTimeCounter <= 0)
@@ -64,6 +79,9 @@ public class PlayerJump : MonoBehaviour
             jumpTimeCounter = jumpTime;
             rb2d.linearVelocity = new Vector2(rb2d.linearVelocity.x, jumpForce);
             stoppingJump = false;
+
+            // tell the animator to play the jump animation
+            myAnimator.SetTrigger("jump");
         }
 
         // Continue jump while button is held (variable jump height)
@@ -71,6 +89,8 @@ public class PlayerJump : MonoBehaviour
         {
             rb2d.AddForce(Vector2.up * jumpHoldForce, ForceMode2D.Force);
             jumpTimeCounter -= Time.deltaTime;
+
+            myAnimator.SetTrigger("jump");
         }
         else if (!isJumpPressed && jumpTimeCounter > 0)
         {
@@ -81,6 +101,13 @@ public class PlayerJump : MonoBehaviour
             {
                 rb2d.linearVelocity = new Vector2(rb2d.linearVelocity.x, rb2d.linearVelocity.y * 0.25f);
             }
+            myAnimator.SetBool("falling", true);
+            myAnimator.ResetTrigger("jump");
+        }
+
+        if (rb2d.linearVelocity.y < 0)
+        {
+            myAnimator.SetBool("falling", true);
         }
     }
 
@@ -96,5 +123,25 @@ public class PlayerJump : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(groundCheck.position, radius);
+    }
+    
+    private void FixedUpdate()
+    {
+        HandleLayers();
+    }
+
+    // Handle animator layers
+    // when jumping, set layer 1 weight to 1 (upper body)
+    // when not jumping, set layer 1 weight to 0 (full body)
+    private void HandleLayers()
+    {
+        if (!grounded)
+        {
+            myAnimator.SetLayerWeight(1, 1);
+        }
+        else
+        {
+            myAnimator.SetLayerWeight(1, 0);
+        }
     }
 }
