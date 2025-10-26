@@ -27,6 +27,9 @@ public class PlayerAnimator : MonoBehaviour
     private void LateUpdate()
     {
         #region Tilt
+        // Comentado para evitar inclinação durante a corrida
+        // Se você quiser manter a inclinação, descomente este bloco
+        /*
         float tiltProgress;
 
         int mult = -1;
@@ -44,6 +47,7 @@ public class PlayerAnimator : MonoBehaviour
         float newRot = ((tiltProgress * maxTilt * 2) - maxTilt);
         float rot = Mathf.LerpAngle(spriteRend.transform.localRotation.eulerAngles.z * mult, newRot, tiltSpeed);
         spriteRend.transform.localRotation = Quaternion.Euler(0, 0, rot * mult);
+        */
         #endregion
 
         CheckAnimationState();
@@ -65,6 +69,8 @@ public class PlayerAnimator : MonoBehaviour
             return;
         }
 
+        // Atualiza os parâmetros do animator
         anim.SetFloat("Vel Y", mov.RB.linearVelocity.y);
+        anim.SetFloat("Vel X", Mathf.Abs(mov.RB.linearVelocity.x));
     }
 }

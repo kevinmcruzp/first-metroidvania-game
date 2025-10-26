@@ -231,7 +231,7 @@ public class PlayerMovement : MonoBehaviour
         {
             SetGravityScale(Data.gravityScale * Data.jumpHangGravityMult);
         }
-        else if (RB.linearVelocity.y < 0)
+        else if (RB.linearVelocity.y < 0 && LastOnGroundTime <= 0) // Só aplica gravidade de queda se estiver NO AR
         {
             //Higher gravity if falling
             SetGravityScale(Data.gravityScale * Data.fallGravityMult);
